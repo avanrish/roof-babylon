@@ -27,32 +27,32 @@ function App() {
       return new Vector3(cords[0], 0, cords[1]);
     });
     // Then drill holes
-    // const holeCoordsArray = [];
-    // uniqWith(holes, isEqual).forEach((data) => {
-    //   const holeJSON = {
-    //     type: 'FeatureCollection',
-    //     features: [
-    //       {
-    //         type: 'Feature',
-    //         geometry: { type: shape.features[0].geometry.type, coordinates: [data] },
-    //       },
-    //     ],
-    //   };
-    //   const holeShape = generateSVG(holeJSON);
-    //   const holeShapeCoords = crunch(holeShape);
-    //   holeCoordsArray.push(holeShapeCoords);
-    // });
-    // const holeVectors = [];
-    // holeCoordsArray.forEach((_c) => {
-    //   const [c] = _c;
-    //   const row = [];
-    //   c.split(', ').forEach((_cords) => {
-    //     const cords = _cords.split(' ').map((v) => parseFloat(v));
-    //     row.push(new Vector3(cords[0], 0, cords[1]));
-    //   });
-    //   holeVectors.push(row);
-    // });
-    setPolygon({ vectors, holes: [] });
+    const holeCoordsArray = [];
+    uniqWith(holes, isEqual).forEach((data) => {
+      const holeJSON = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: { type: shape.features[0].geometry.type, coordinates: [data] },
+          },
+        ],
+      };
+      const holeShape = generateSVG(holeJSON);
+      const holeShapeCoords = crunch(holeShape);
+      holeCoordsArray.push(holeShapeCoords);
+    });
+    const holeVectors = [];
+    holeCoordsArray.forEach((_c) => {
+      const [c] = _c;
+      const row = [];
+      c.split(', ').forEach((_cords) => {
+        const cords = _cords.split(' ').map((v) => parseFloat(v));
+        row.push(new Vector3(cords[0], 0, cords[1]));
+      });
+      holeVectors.push(row);
+    });
+    setPolygon({ vectors, holes: holeVectors });
   }, [json]);
 
   const handleClick = () => {
@@ -61,8 +61,8 @@ function App() {
       const { type, coordinates } = JSON.parse(str);
       const newJson = {
         type: 'FeatureCollection',
-        // features: [{ type: 'Feature', geometry: { type, coordinates: [coordinates[0]] } }],
-        features: [{ type: 'Feature', geometry: { type, coordinates } }],
+        features: [{ type: 'Feature', geometry: { type, coordinates: [coordinates[0]] } }],
+        // features: [{ type: 'Feature', geometry: { type, coordinates } }],
       };
       console.log(str);
       const [, ...holes] = coordinates;
