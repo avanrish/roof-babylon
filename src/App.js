@@ -19,7 +19,8 @@ function App() {
   useEffect(() => {
     const { shape, holes } = json;
     // Main shape first
-    const mainShape = generateSVG(shape);
+    // generateSVG(shape, width = Bredde, length = Lengde)
+    const mainShape = generateSVG(shape, 35.59000015258789, 29.600000381469727);
     setSvg(mainShape);
     const mainShapeCoords = crunch(mainShape);
     const vectors = mainShapeCoords[0].split(', ').map((cords) => {
@@ -38,7 +39,7 @@ function App() {
           },
         ],
       };
-      const holeShape = generateSVG(holeJSON);
+      const holeShape = generateSVG(holeJSON, 2.9000000953674316, 2.1700000762939453);
       const holeShapeCoords = crunch(holeShape);
       holeCoordsArray.push(holeShapeCoords);
     });
@@ -61,39 +62,15 @@ function App() {
       const { type, coordinates } = JSON.parse(str);
       const newJson = {
         type: 'FeatureCollection',
-        features: [{ type: 'Feature', geometry: { type, coordinates: [coordinates[0]] } }],
-        // features: [{ type: 'Feature', geometry: { type, coordinates } }],
+        // features: [{ type: 'Feature', geometry: { type, coordinates: [coordinates[0]] } }],
+        features: [{ type: 'Feature', geometry: { type, coordinates } }],
       };
-      console.log(str);
       const [, ...holes] = coordinates;
       setJson({ shape: newJson, holes });
     } catch (err) {
       console.log(err);
     }
   };
-
-  useEffect(() => {
-    const xd = [
-      [10.588440543, 59.915783523, 82.17],
-      [10.588364731, 59.915739085, 82.17],
-      [10.58823468, 59.915795075, 82.17],
-      [10.588223283, 59.915788389, 82.17],
-      [10.588120922, 59.915832367, 82.17],
-      [10.588131583, 59.915838525, 82.17],
-      [10.587859417, 59.915955685, 82.17],
-      [10.587847279, 59.915948651, 82.17],
-      [10.587712316, 59.916006679, 82.17],
-      [10.587724652, 59.916013981, 82.17],
-      [10.587655595, 59.916043734, 82.17],
-      [10.587804276, 59.916130767, 82.14],
-      [10.587809353, 59.916128545, 82.14],
-      [10.588452399, 59.915851824, 82.17],
-      [10.588512677, 59.915825859, 82.17],
-      [10.588440543, 59.915783523, 82.17],
-    ];
-    const x = xd.map((v) => v[0]);
-    const y = xd.map((v) => v[1]);
-  }, []);
 
   return (
     <div>
@@ -132,7 +109,20 @@ function App() {
               key={`shape-${JSON.stringify(json)}`}
               updatable
               shape={polygon.vectors}
-              holes={polygon.holes}
+              // holes={polygon.holes}
+              name="poly"
+              earcutInjection={earcut}
+              scaling={new Vector3(0.3, 0.3, 0.3)}
+              position={new Vector3(10, 0, 0)}
+              depth={5}
+            />
+          )}
+          {polygon.holes.length && (
+            <extrudePolygon
+              key={`hole-${JSON.stringify(json)}`}
+              updatable
+              shape={polygon.holes[0]}
+              // holes={polygon.holes}
               name="poly"
               earcutInjection={earcut}
               scaling={new Vector3(0.3, 0.3, 0.3)}
